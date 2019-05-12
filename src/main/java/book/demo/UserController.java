@@ -87,41 +87,47 @@ public class UserController{
         String username = request.getParameter("username");
         String pwd = request.getParameter("userpwd");
         User user=userRepository.findByUsername(username);
-        String passreal=user.getPassword();
-        if (username == null || username.isEmpty()) {
-            return "帐号为空";
+        Integer state =user.getState();
+        if(state==0) {
+            String passreal = user.getPassword();
+            if (username == null || username.isEmpty()) {
+                return "帐号为空";
+            }
+            if (pwd == null || pwd.isEmpty()) {
+                return "密码为空";
+            }
+            if (pwd.equals(passreal)) {
+                ServletContext servletContext = request.getServletContext();
+                servletContext.setAttribute("username", username);
+                //HttpSession session=request.getSession(true);
+                //session.setMaxInactiveInterval(30*60);
+                //session.setAttribute("username", "hi");
+                //session.setAttribute("password",pwd);
+                //User user1=(User)session.getAttribute("username");
+                //System.out.println(user1.getUsername());
+
+                return "登录成功！" + username + "欢迎！！！";
+            } else {
+                return "帐号或密码错误";
+
+            }
         }
-        if (pwd == null || pwd.isEmpty()) {
-            return "密码为空";
+        if(state==2)
+        {
+            return"对不起，您已经被禁用，请联系管理员了解详情！";
         }
-        if ( pwd.equals(passreal)) {
-            ServletContext servletContext=request.getServletContext();
-            servletContext.setAttribute("username", username);
-            //HttpSession session=request.getSession(true);
-            //session.setMaxInactiveInterval(30*60);
-            //session.setAttribute("username", "hi");
-            //session.setAttribute("password",pwd);
-            //User user1=(User)session.getAttribute("username");
-            //System.out.println(user1.getUsername());
-
-            return "登录成功！"+username+"欢迎！！！";
-        } else {
-            return "帐号或密码错误";
-
-        }
-
-
+        return "欢迎管理员登录！"  ;
 
     }
 
-    @RequestMapping("test")
+    @RequestMapping("checkuser")
     @ResponseBody
-    public  Integer tryit(HttpServletRequest request){
+    public  Integer checkuser(HttpServletRequest request){
 
         ServletContext servletContext=request.getServletContext();
         String title = servletContext.getAttribute("username").toString();
-        Integer userid=userRepository.findByUsername(title).getUserid();
-        return userid;
+        Integer state=userRepository.findByUsername(title).getState();
+        return state;
     }
 
 
