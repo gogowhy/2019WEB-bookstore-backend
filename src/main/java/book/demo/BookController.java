@@ -117,9 +117,55 @@ public class BookController{
     }
 
 
+    @RequestMapping("bookdelete")
+    @ResponseBody
+    public String bookdelete(HttpServletRequest request)
+    {
+        String bookname=request.getParameter("bookname");
+        Books book=bookRepository.findByBookname(bookname);
+        bookRepository.delete(book);
+        return "已删除"+bookname;
+    }
 
 
+    @RequestMapping("booknumber")
+    @ResponseBody
+    public String booknumber(HttpServletRequest request)
+    {
+        String bookname=request.getParameter("bookname");
+        String repertory_toset=request.getParameter("booknumber");
+        Integer number=Integer.valueOf(repertory_toset);
+        Books book=bookRepository.findByBookname(bookname);
+        book.setRepertory(number);
+        bookRepository.save(book);
+        return  "已设置"+bookname+"的库存为"+number+"!" ;
+    }
 
+    @RequestMapping("bookadd")
+    @ResponseBody
+    public String bookadd(HttpServletRequest request)
+    {
+        String isbn=request.getParameter("isbn");
+        String name=request.getParameter("bookname");
+        String price=request.getParameter("price");
+        String author=request.getParameter("author");
+        String repertory=request.getParameter("repertory");
+        String description=request.getParameter("description");
+
+        Integer price_number=Integer.valueOf(price);
+        Integer repertory_number=Integer.valueOf(repertory);
+
+        Books book =new Books();
+        book.setIsbn(isbn);
+        book.setName(name);
+        book.setPrice(price_number);
+        book.setAuthor(author);
+        book.setRepertory(repertory_number);
+        book.setDescription(description);
+
+        bookRepository.save(book);
+        return  "已新增图书"+name+"!" ;
+    }
 
 
 

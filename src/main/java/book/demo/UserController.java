@@ -64,6 +64,14 @@ public class UserController{
         userRepository.save(user);
     }
 
+    @RequestMapping("delete/{userid}")
+    @ResponseBody
+    public  void delete(@PathVariable("userid")Integer userid){
+        User user = userRepository.findById(userid).get();
+
+
+        userRepository.delete(user);
+    }
 
     @RequestMapping("setforbid/{userid}")
     @ResponseBody
@@ -141,6 +149,29 @@ public class UserController{
         userRepository.save(user);
         return "欢迎您，注册成功"+username+"!";
 
+    }
+
+    @RequestMapping("userforbid")
+    @ResponseBody
+    public String userdorbid(HttpServletRequest request)
+    {
+        String id=request.getParameter("userid");
+        Integer userid_num=Integer.valueOf(id);
+        User user= userRepository.findByUserid(userid_num);
+        user.setState(2);
+        userRepository.save(user);
+        return"已经禁止用户"+user.getUsername()+"!";
+    }
+    @RequestMapping("userbanlifting")
+    @ResponseBody
+    public String userbanlifting(HttpServletRequest request)
+    {
+        String id=request.getParameter("userid");
+        Integer userid_num=Integer.valueOf(id);
+        User user= userRepository.findByUserid(userid_num);
+        user.setState(0);
+        userRepository.save(user);
+        return"已经解禁用户"+user.getUsername()+"!";
     }
 
 }
