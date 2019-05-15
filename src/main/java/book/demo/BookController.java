@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
 @RestController
 @RequestMapping("/books")
 public class BookController{
@@ -70,7 +72,10 @@ public class BookController{
         Order neworder=new Order();
         Books book=bookRepository.findByBookname(bookname);
         neworder.setPaid(0);
-        neworder.setOrdertime("today");
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String createdate = sdf.format(date);
+        neworder.setOrdertime(createdate);
 
 
         ServletContext servletContext=request.getServletContext();
