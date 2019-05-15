@@ -141,6 +141,19 @@ public class BookController{
         return  "已设置"+bookname+"的库存为"+number+"!" ;
     }
 
+    @RequestMapping("bookdescription")
+    @ResponseBody
+    public String bookdescription(HttpServletRequest request)
+    {
+        String bookname=request.getParameter("bookname");
+        String description_toset=request.getParameter("bookdescription");
+
+        Books book=bookRepository.findByBookname(bookname);
+        book.setDescription(description_toset);
+        bookRepository.save(book);
+        return  "已修改"+bookname+"的description!" ;
+    }
+
     @RequestMapping("bookadd")
     @ResponseBody
     public String bookadd(HttpServletRequest request)

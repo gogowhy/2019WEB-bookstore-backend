@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class order_out_structure {
 
-
+    public Integer userid;
     public Integer orderid;
     public Integer price;
     public String bookname;

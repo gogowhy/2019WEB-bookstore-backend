@@ -149,6 +149,7 @@ public class OrderController
         }//middle里面存储的是所有paid的订单状态的order
         for(Integer i=0;i<middle.size();i++)
         {
+
             //String ordertime=middle.get(i).ordertime;
             // Integer orderid =middle.get(i).orderid;
             List<OrderItem> orderItems =orderItemRepository.findByOrderid(middle.get(i).orderid);
@@ -157,6 +158,7 @@ public class OrderController
             {
                 String ordertime=middle.get(i).ordertime;
                 Integer orderid =middle.get(i).orderid;
+
                 Books book =new Books();
                 book=bookRepository.findByBookid(orderItems.get(j).bookid);
                 String bookname=book.getName();
@@ -179,6 +181,114 @@ public class OrderController
 
 
     }
+
+
+
+    @RequestMapping("/query_all_order")
+    @ResponseBody
+    public  List<order_out_structure> queryallorder(HttpServletRequest request)
+    {
+
+        List<Order> orders=orderRepository.findAll();
+        List<Order> middle = new ArrayList<Order>();
+        List<order_out_structure> output=new ArrayList<order_out_structure>();
+        for(Integer i=0;i<orders.size();i++)
+        {
+
+            if(orders.get(i).paid==1)
+                middle.add(orders.get(i));
+        }//middle里面存储的是所有paid的订单状态的order
+        for(Integer i=0;i<middle.size();i++)
+        {
+            //String ordertime=middle.get(i).ordertime;
+            // Integer orderid =middle.get(i).orderid;
+            List<OrderItem> orderItems =orderItemRepository.findByOrderid(middle.get(i).orderid);
+            //找到当前orderid对应的orderitem的集合
+            for(Integer j=0;j<orderItems.size();j++)
+            {
+                String ordertime=middle.get(i).ordertime;
+                Integer orderid =middle.get(i).orderid;
+                Integer the_userid=middle.get(i).userid;
+                Books book =new Books();
+                book=bookRepository.findByBookid(orderItems.get(j).bookid);
+                String bookname=book.getName();
+                Integer number =orderItems.get(j).number;
+                Integer oneprice=book.getPrice();
+                Integer price =number*oneprice;
+                order_out_structure the_temp_out= new order_out_structure();
+                the_temp_out.orderid=orderid;
+                the_temp_out.bookname=bookname;
+                the_temp_out.price=price;
+                the_temp_out.ordertime=ordertime;
+                the_temp_out.number=number;
+
+                the_temp_out.userid=the_userid;
+                output.add(the_temp_out);
+            }
+
+        }
+
+        return output;
+
+    }
+
+@RequestMapping("booksales")
+@ResponseBody
+    public String booksales(HttpServletRequest request) {
+    String the_bookname=request.getParameter("bookname");
+
+    List<Order> orders=orderRepository.findAll();
+    List<Order> middle = new ArrayList<Order>();
+    List<order_out_structure> output=new ArrayList<order_out_structure>();
+    for(Integer i=0;i<orders.size();i++)
+    {
+
+        if(orders.get(i).paid==1)
+            middle.add(orders.get(i));
+    }//middle里面存储的是所有paid的订单状态的order
+    for(Integer i=0;i<middle.size();i++)
+    {
+
+        List<OrderItem> orderItems =orderItemRepository.findByOrderid(middle.get(i).orderid);
+        //找到当前orderid对应的orderitem的集合
+        for(Integer j=0;j<orderItems.size();j++)
+        {
+            String ordertime=middle.get(i).ordertime;
+            Integer orderid =middle.get(i).orderid;
+            Integer the_userid=middle.get(i).userid;
+            Books book =new Books();
+            book=bookRepository.findByBookid(orderItems.get(j).bookid);
+            String bookname=book.getName();
+            Integer number =orderItems.get(j).number;
+            Integer oneprice=book.getPrice();
+            Integer price =number*oneprice;
+            order_out_structure the_temp_out= new order_out_structure();
+            the_temp_out.orderid=orderid;
+            the_temp_out.bookname=bookname;
+            the_temp_out.price=price;
+            the_temp_out.ordertime=ordertime;
+            the_temp_out.number=number;
+
+            the_temp_out.userid=the_userid;
+            output.add(the_temp_out);
+        }
+
+    }
+
+    Integer sum=0;
+    for(Integer q=0;q<output.size();q++)
+    {
+        String name=output.get(q).bookname;
+        Integer num=output.get(q).number;
+
+        if(name.contains(the_bookname)) {
+            sum += num;
+        }
+    }
+
+    return "书籍" + the_bookname + "的销量为" +sum;
+}
+
     /*public  List<order_out_structure> querycart(HttpServletRequest request)
     {
         ServletContext servletContext=request.getServletContext();
