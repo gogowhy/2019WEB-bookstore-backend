@@ -114,9 +114,33 @@ public class UserController{
         }
         if(state==2)
         {
+            ServletContext servletContext = request.getServletContext();
+            servletContext.setAttribute("username", username);
             return"对不起，您已经被禁用，请联系管理员了解详情！";
         }
-        return "欢迎管理员登录！"  ;
+        else
+        {
+            String passreal = user.getPassword();
+            if (username == null || username.isEmpty()) {
+                return "帐号为空";
+            }
+            if (pwd == null || pwd.isEmpty()) {
+                return "密码为空";
+            }
+            if (pwd.equals(passreal)) {
+                ServletContext servletContext = request.getServletContext();
+                servletContext.setAttribute("username", username);
+                //HttpSession session=request.getSession(true);
+                //session.setMaxInactiveInterval(30*60);
+                //session.setAttribute("username", "hi");
+                //session.setAttribute("password",pwd);
+                //User user1=(User)session.getAttribute("username");
+                //System.out.println(user1.getUsername());
+
+                return "管理员登录成功！" + username + "欢迎！！！";
+            }
+           else return "密码或用户名错误"  ;
+        }
 
     }
 
