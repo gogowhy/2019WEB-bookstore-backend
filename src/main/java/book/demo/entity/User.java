@@ -1,4 +1,8 @@
-package book.demo;
+package book.demo.entity;
+
+import book.demo.repository.*;
+import book.demo.entity.*;
+import book.demo.controller.*;
 
 import javax.persistence.*;
 import java.io.Serializable;

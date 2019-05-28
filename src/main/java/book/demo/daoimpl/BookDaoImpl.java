@@ -1,4 +1,14 @@
-package book.demo;
+package book.demo.daoimpl;
+
+
+
+import book.demo.repository.*;
+import book.demo.entity.*;
+import book.demo.controller.*;
+import book.demo.dao.*;
+import book.demo.daoimpl.*;
+import book.demo.service.*;
+import book.demo.serviceimpl.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,16 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
-@RestController
-@RequestMapping("/books")
-public class BookController{
 
+@Repository
+public class BookDaoImpl implements BookDao {
     @Autowired
     private BookRepository bookRepository;
-    //private static int cnt = 0;
 
     @Autowired
     private UserRepository userRepository;
@@ -28,19 +37,17 @@ public class BookController{
     @Autowired
     private OrderItemRepository orderItemRepository;
 
-    @RequestMapping("queryAll")
-    @ResponseBody
+@Override
     public List<Books> queryAll(){
         List<Books> list = new ArrayList<Books>();
         list = bookRepository.findAll();
         return list;
     }
 
-    @RequestMapping("add/{isbn}/{name}/{price}/{author}/{repertory}/{description}")
-    @ResponseBody
-    public  void add(@PathVariable("isbn") String isbn, @PathVariable("name")String name ,
-                     @PathVariable("price") Integer price,@PathVariable("author")String author,
-                     @PathVariable("repertory") Integer repertory,@PathVariable("description") String description){
+    @Override
+    public  void add( String isbn, String name ,
+                    Integer price,String author,
+                     Integer repertory, String description){
         Books book = new Books();
         book.setIsbn(isbn);
         book.setName(name);
@@ -51,9 +58,9 @@ public class BookController{
         bookRepository.save(book);
     }
 
-    @RequestMapping("update/{bookid}/sell")
-    @ResponseBody
-    public  void update(@PathVariable("bookid")Integer id){
+
+    @Override
+    public  void update(Integer id){
         Books book = bookRepository.findById(id).get();
 
         Integer n=book.getRepertory();
@@ -62,8 +69,7 @@ public class BookController{
         bookRepository.save(book);
     }
 
-    @RequestMapping("addtocart")
-    @ResponseBody
+    @Override
     public String addtocart(HttpServletRequest request)
     {
         String bookname =request.getParameter("bookname");
@@ -95,11 +101,10 @@ public class BookController{
 
 
         orderItemRepository.save(orderItem);
-       return"添加成功！";
+        return"添加成功！";
     }
 
-    @RequestMapping("checknow")
-    @ResponseBody
+    @Override
     public String checknow(HttpServletRequest request)
     {
         String theorderid=request.getParameter("orderid");
@@ -108,6 +113,7 @@ public class BookController{
         List<OrderItem> orderItems =orderItemRepository.findByOrderid(orderid);
         for(Integer i=0;i<orderItems.size();i++)
         {
+
             Books book =bookRepository.findByBookid(orderItems.get(i).getBookid());
             Integer number=orderItems.get(i).getNumber();
             Integer repertory=book.getRepertory()-number;
@@ -121,9 +127,38 @@ public class BookController{
 
     }
 
+    @Override
+    public String checkall (HttpServletRequest request)
+    {
+        ServletContext servletContext=request.getServletContext();
+        String username = servletContext.getAttribute("username").toString();
+        Integer userid =userRepository.findByUsername(username).getUserid();
+        List <Order> user_cart=orderRepository.findByUserid(userid);
+        for(Integer i=0;i<user_cart.size();i++)
+        {
+            List<OrderItem> orderItems =orderItemRepository.findByOrderid(user_cart.get(i).getOrderid());
+            for(Integer j=0;j<orderItems.size();j++)
+            {
+                if(user_cart.get(i).getPaid()==0)
+                {
 
-    @RequestMapping("bookdelete")
-    @ResponseBody
+                    Books book = bookRepository.findByBookid(orderItems.get(j).getBookid());
+
+                    Integer number = orderItems.get(j).getNumber();
+
+                    Integer repertory = book.getRepertory() - number;
+                    book.setRepertory(repertory);
+                    bookRepository.save(book);
+                }
+            }
+            user_cart.get(i).setPaid(1);
+            orderRepository.save(user_cart.get(i));
+        }
+        return "已经为所有商品结账";
+    }
+
+
+    @Override
     public String bookdelete(HttpServletRequest request)
     {
         String bookname=request.getParameter("bookname");
@@ -133,8 +168,7 @@ public class BookController{
     }
 
 
-    @RequestMapping("booknumber")
-    @ResponseBody
+    @Override
     public String booknumber(HttpServletRequest request)
     {
         String bookname=request.getParameter("bookname");
@@ -146,8 +180,7 @@ public class BookController{
         return  "已设置"+bookname+"的库存为"+number+"!" ;
     }
 
-    @RequestMapping("bookdescription")
-    @ResponseBody
+    @Override
     public String bookdescription(HttpServletRequest request)
     {
         String bookname=request.getParameter("bookname");
@@ -159,8 +192,7 @@ public class BookController{
         return  "已修改"+bookname+"的description!" ;
     }
 
-    @RequestMapping("bookadd")
-    @ResponseBody
+    @Override
     public String bookadd(HttpServletRequest request)
     {
         String isbn=request.getParameter("isbn");
@@ -183,6 +215,27 @@ public class BookController{
 
         bookRepository.save(book);
         return  "已新增图书"+name+"!" ;
+    }
+
+
+    @Override
+    public void setbookdetail(HttpServletRequest request)
+    {
+        String bookname=request.getParameter("bookname");
+        ServletContext servletContext = request.getServletContext();
+        servletContext.setAttribute("bookname", bookname);
+    }
+
+
+    public List<Books> querydetail(HttpServletRequest request)
+    {
+        ServletContext servletContext=request.getServletContext();
+        String bookname = servletContext.getAttribute("bookname").toString();
+        List<Books> list = new ArrayList<Books>();
+        Books book=new Books();
+        book = bookRepository.findByBookname(bookname);
+        list.add(book);
+        return list;
     }
 
 

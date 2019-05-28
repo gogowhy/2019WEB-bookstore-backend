@@ -1,39 +1,32 @@
-package book.demo;
+package book.demo.daoimpl;
 
-import com.sun.deploy.net.HttpResponse;
+import book.demo.dao.UserDao;
+import book.demo.entity.Order;
+import book.demo.entity.User;
+import book.demo.repository.OrderRepository;
+import book.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.print.DocFlavor;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.*;
-import java.io.*;
-import java.sql.*;
-import javax.servlet.http.*;
-@RestController
-@RequestMapping("/user")
 
-public class UserController{
+@Repository
+public class UserDaoImpl implements UserDao {
     @Autowired
     public UserRepository userRepository;
     @Autowired
     public OrderRepository orderRepository;
     //private static int cnt = 0;
 
-    @RequestMapping("queryAll")
-    @ResponseBody
+    @Override
     public List<User> queryAll(){
         List<User> list = new ArrayList<User>();
         list = userRepository.findAll();
@@ -41,11 +34,9 @@ public class UserController{
     }
 
 
-
-    @RequestMapping("add/{username}/{passw}/{tell}/{state}")
-    @ResponseBody
-    public void adduser(@PathVariable("username")String username,@PathVariable("passw") String passw,
-                        @PathVariable("tell")String tell,@PathVariable("state") Integer state)
+    @Override
+    public void adduser(String username,  String passw,
+                       String tell, Integer state)
     {
         User user=new User();
         user.setUsername(username);
@@ -55,35 +46,31 @@ public class UserController{
         userRepository.save(user);
     }
 
-    @RequestMapping("setadmin/{userid}")
-    @ResponseBody
-    public  void update(@PathVariable("userid")Integer userid){
+    @Override
+    public  void update(Integer userid){
         User user = userRepository.findById(userid).get();
 
         user.setState(1);
         userRepository.save(user);
     }
 
-    @RequestMapping("delete/{userid}")
-    @ResponseBody
-    public  void delete(@PathVariable("userid")Integer userid){
+    @Override
+    public  void delete(Integer userid){
         User user = userRepository.findById(userid).get();
 
 
         userRepository.delete(user);
     }
 
-    @RequestMapping("setforbid/{userid}")
-    @ResponseBody
-    public  void forbiduser(@PathVariable("userid")Integer userid){
+    @Override
+    public  void forbiduser(Integer userid){
         User user = userRepository.findById(userid).get();
         user.setState(2);
         userRepository.save(user);
     }
 
-    @RequestMapping(value = { "/login" }, method = RequestMethod.POST)
-    @ResponseBody
-    public String Login(HttpServletRequest request,HttpServletResponse response) {
+    @Override
+    public String Login(HttpServletRequest request, HttpServletResponse response) {
         String username = request.getParameter("username");
         String pwd = request.getParameter("userpwd");
         User user=userRepository.findByUsername(username);
@@ -113,9 +100,9 @@ public class UserController{
             }
         }
         if(state==2)
-        {
-            ServletContext servletContext = request.getServletContext();
+        {ServletContext servletContext = request.getServletContext();
             servletContext.setAttribute("username", username);
+
             return"对不起，您已经被禁用，请联系管理员了解详情！";
         }
         else
@@ -139,13 +126,12 @@ public class UserController{
 
                 return "管理员登录成功！" + username + "欢迎！！！";
             }
-           else return "密码或用户名错误"  ;
+            else return "密码或用户名错误"  ;
         }
 
     }
 
-    @RequestMapping("checkuser")
-    @ResponseBody
+    @Override
     public  Integer checkuser(HttpServletRequest request){
 
         ServletContext servletContext=request.getServletContext();
@@ -155,18 +141,15 @@ public class UserController{
     }
 
 
-   
-    @RequestMapping("test3")
-    @ResponseBody
+    @Override
     public List<Order> tryit3(HttpServletRequest request){
 
-       List<Order> order =orderRepository.findByUserid(1);
+        List<Order> order =orderRepository.findByUserid(1);
         return order;
     }
 
 
-    @RequestMapping(value = { "/register" }, method = RequestMethod.POST)
-    @ResponseBody
+    @Override
     public String Register(HttpServletRequest request) {
         String username = request.getParameter("username");
         String pwd = request.getParameter("userpwd");
@@ -181,8 +164,7 @@ public class UserController{
 
     }
 
-    @RequestMapping("userforbid")
-    @ResponseBody
+    @Override
     public String userdorbid(HttpServletRequest request)
     {
         String id=request.getParameter("userid");
@@ -192,8 +174,7 @@ public class UserController{
         userRepository.save(user);
         return"已经禁止用户"+user.getUsername()+"!";
     }
-    @RequestMapping("userbanlifting")
-    @ResponseBody
+    @Override
     public String userbanlifting(HttpServletRequest request)
     {
         String id=request.getParameter("userid");
@@ -203,5 +184,4 @@ public class UserController{
         userRepository.save(user);
         return"已经解禁用户"+user.getUsername()+"!";
     }
-
 }

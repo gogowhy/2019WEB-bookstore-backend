@@ -1,38 +1,39 @@
-package book.demo;
+package book.demo.daoimpl;
 
-import javafx.geometry.InsetsBuilder;
+import book.demo.dao.OrderDao;
+import book.demo.entity.Books;
+import book.demo.entity.Order;
+import book.demo.entity.OrderItem;
+import book.demo.entity.order_out_structure;
+import book.demo.repository.BookRepository;
+import book.demo.repository.OrderItemRepository;
+import book.demo.repository.OrderRepository;
+import book.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
-@RequestMapping("/order")
-
-public class OrderController
-{
+@Repository
+public class OrderDaoImpl implements OrderDao {
 
     @Autowired
     public OrderRepository orderRepository;
     @Autowired
-    public  UserRepository userRepository;
+    public UserRepository userRepository;
     @Autowired
     public OrderItemRepository orderItemRepository;
     @Autowired
     public BookRepository bookRepository;
 
 
-    @RequestMapping("queryAll")
-    @ResponseBody
+   @Override
     public List<Order> queryAll(){
         List<Order> list = new ArrayList<Order>();
         list = orderRepository.findAll();
@@ -43,10 +44,9 @@ public class OrderController
 
     }
 
-    @RequestMapping("add/{userid}/{paid}/{ordertime}")
-    @ResponseBody
-    public  void add(@PathVariable("userid")Integer userid,@PathVariable("paid") Integer paid,
-                     @PathVariable("ordertime" )String ordertime)
+    @Override
+    public  void add(Integer userid,  Integer paid,
+                    String ordertime)
     {
         Order order=new Order();
         order.setUserid(userid);
@@ -57,33 +57,31 @@ public class OrderController
 
 
 
-    @RequestMapping("paid/{orderid}")
-    @ResponseBody
-    public  void update(@PathVariable("orderid") Integer orderid){
+    @Override
+    public  void update(Integer orderid){
         Order order= orderRepository.findById(orderid).get();
         order.setPaid(1);
         orderRepository.save(order);
     }
 
 
-    @RequestMapping(value = "/findorderid/{orderid}")
-    public Order getStu( @PathVariable("orderid") Integer orderid)
+    @Override
+    public Order getStu( Integer orderid)
     {
 
         Order order = orderRepository.findById(orderid).get();
         return order;
     }
 
-    @RequestMapping(value = "/findorderuserid/{orderuserid}")
-    public Order getOrd( @PathVariable("orderuserid") Integer orderuserid){
+    @Override
+    public Order getOrd(  Integer orderuserid){
         Order order = orderRepository.findById(orderuserid).get();
         return order;
     }
 
 
 
-    @RequestMapping("/queryorder")
-    @ResponseBody
+    @Override
     public  List<order_out_structure> queryorder(HttpServletRequest request)
     {
         ServletContext servletContext=request.getServletContext();
@@ -101,7 +99,7 @@ public class OrderController
         for(Integer i=0;i<middle.size();i++)
         {
             //String ordertime=middle.get(i).ordertime;
-           // Integer orderid =middle.get(i).orderid;
+            // Integer orderid =middle.get(i).orderid;
             List<OrderItem> orderItems =orderItemRepository.findByOrderid(middle.get(i).orderid);
             //找到当前orderid对应的orderitem的集合
             for(Integer j=0;j<orderItems.size();j++)
@@ -125,14 +123,13 @@ public class OrderController
 
         }
 
-       return output;
+        return output;
 
 
 
     }
 
-    @RequestMapping("/querycart")
-    @ResponseBody
+    @Override
     public  List<order_out_structure> querycart(HttpServletRequest request)
     {
         ServletContext servletContext=request.getServletContext();
@@ -184,8 +181,7 @@ public class OrderController
 
 
 
-    @RequestMapping("/query_all_order")
-    @ResponseBody
+    @Override
     public  List<order_out_structure> queryallorder(HttpServletRequest request)
     {
 
@@ -232,62 +228,61 @@ public class OrderController
 
     }
 
-@RequestMapping("booksales")
-@ResponseBody
+    @Override
     public String booksales(HttpServletRequest request) {
-    String the_bookname=request.getParameter("bookname");
+        String the_bookname=request.getParameter("bookname");
 
-    List<Order> orders=orderRepository.findAll();
-    List<Order> middle = new ArrayList<Order>();
-    List<order_out_structure> output=new ArrayList<order_out_structure>();
-    for(Integer i=0;i<orders.size();i++)
-    {
-
-        if(orders.get(i).paid==1)
-            middle.add(orders.get(i));
-    }//middle里面存储的是所有paid的订单状态的order
-    for(Integer i=0;i<middle.size();i++)
-    {
-
-        List<OrderItem> orderItems =orderItemRepository.findByOrderid(middle.get(i).orderid);
-        //找到当前orderid对应的orderitem的集合
-        for(Integer j=0;j<orderItems.size();j++)
+        List<Order> orders=orderRepository.findAll();
+        List<Order> middle = new ArrayList<Order>();
+        List<order_out_structure> output=new ArrayList<order_out_structure>();
+        for(Integer i=0;i<orders.size();i++)
         {
-            String ordertime=middle.get(i).ordertime;
-            Integer orderid =middle.get(i).orderid;
-            Integer the_userid=middle.get(i).userid;
-            Books book =new Books();
-            book=bookRepository.findByBookid(orderItems.get(j).bookid);
-            String bookname=book.getName();
-            Integer number =orderItems.get(j).number;
-            Integer oneprice=book.getPrice();
-            Integer price =number*oneprice;
-            order_out_structure the_temp_out= new order_out_structure();
-            the_temp_out.orderid=orderid;
-            the_temp_out.bookname=bookname;
-            the_temp_out.price=price;
-            the_temp_out.ordertime=ordertime;
-            the_temp_out.number=number;
 
-            the_temp_out.userid=the_userid;
-            output.add(the_temp_out);
+            if(orders.get(i).paid==1)
+                middle.add(orders.get(i));
+        }//middle里面存储的是所有paid的订单状态的order
+        for(Integer i=0;i<middle.size();i++)
+        {
+
+            List<OrderItem> orderItems =orderItemRepository.findByOrderid(middle.get(i).orderid);
+            //找到当前orderid对应的orderitem的集合
+            for(Integer j=0;j<orderItems.size();j++)
+            {
+                String ordertime=middle.get(i).ordertime;
+                Integer orderid =middle.get(i).orderid;
+                Integer the_userid=middle.get(i).userid;
+                Books book =new Books();
+                book=bookRepository.findByBookid(orderItems.get(j).bookid);
+                String bookname=book.getName();
+                Integer number =orderItems.get(j).number;
+                Integer oneprice=book.getPrice();
+                Integer price =number*oneprice;
+                order_out_structure the_temp_out= new order_out_structure();
+                the_temp_out.orderid=orderid;
+                the_temp_out.bookname=bookname;
+                the_temp_out.price=price;
+                the_temp_out.ordertime=ordertime;
+                the_temp_out.number=number;
+
+                the_temp_out.userid=the_userid;
+                output.add(the_temp_out);
+            }
+
         }
 
-    }
+        Integer sum=0;
+        for(Integer q=0;q<output.size();q++)
+        {
+            String name=output.get(q).bookname;
+            Integer num=output.get(q).number;
 
-    Integer sum=0;
-    for(Integer q=0;q<output.size();q++)
-    {
-        String name=output.get(q).bookname;
-        Integer num=output.get(q).number;
-
-        if(name.contains(the_bookname)) {
-            sum += num;
+            if(name.contains(the_bookname)) {
+                sum += num;
+            }
         }
-    }
 
-    return "书籍" + the_bookname + "的销量为" +sum;
-}
+        return "书籍" + the_bookname + "的销量为" +sum;
+    }
 
     /*public  List<order_out_structure> querycart(HttpServletRequest request)
     {
@@ -328,6 +323,5 @@ public class OrderController
 
         return output;
     }*///浅拷贝 无法使用
-
 
 }

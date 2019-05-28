@@ -1,5 +1,9 @@
-package book.demo;
-
+package book.demo.controller;
+import book.demo.repository.*;
+import book.demo.entity.*;
+import book.demo.controller.*;
+import book.demo.service.OrderItemService;
+import book.demo.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +16,13 @@ public class OrderItemController
 {
 
     @Autowired
-    private OrderItemRepository orderItemRepository;
+    private OrderItemService orderItemService;
 
 
     @RequestMapping("queryAll")
     @ResponseBody
     public List<OrderItem> queryAll(){
-        List<OrderItem> list = new ArrayList<OrderItem>();
-        list =orderItemRepository.findAll();
-        return list;
+        return orderItemService.queryAll();
     }
 
     @RequestMapping("add/{userid}/{orderid}/{bookid}/{number}")
@@ -28,12 +30,7 @@ public class OrderItemController
     public void addorderitem(@PathVariable("userid") Integer userid,@PathVariable("orderid") Integer orderid,
                              @PathVariable("bookid") Integer bookid,@PathVariable("number") Integer number)
     {
-        OrderItem orderitem =new OrderItem();
-        orderitem.setUserid(userid);
-        orderitem.setOrderid(orderid);
-        orderitem.setBookid(bookid);
-        orderitem.setNumber(number);
-        orderItemRepository.save(orderitem);
+        orderItemService.addorderitem(userid,orderid,bookid,number);
     }
 
 
