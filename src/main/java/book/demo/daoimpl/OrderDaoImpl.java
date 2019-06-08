@@ -284,6 +284,222 @@ public class OrderDaoImpl implements OrderDao {
         return "书籍" + the_bookname + "的销量为" +sum;
     }
 
+
+
+
+
+    @Override
+    //管理员查询某一本书在一定时间内的销量
+    public  String timesalesall(HttpServletRequest request)
+    {
+        String bookname = request.getParameter("bookname");
+        String year_query =request.getParameter("year");
+        String month_query=request.getParameter("month");
+        String date_query =request.getParameter("date");
+
+        ServletContext servletContext=request.getServletContext();
+        String username = servletContext.getAttribute("username").toString();
+
+        Integer userid=userRepository.findByUsername(username).getUserid();
+
+        Integer year_query_int =Integer.valueOf(year_query);
+        Integer month_query_int=Integer.valueOf(month_query);
+        Integer date_query_int=Integer.valueOf(date_query);
+
+        Integer bookid_query=bookRepository.findByBookname(bookname).getId();
+        Integer sales=0;
+        List<OrderItem> allorderitem =orderItemRepository.findAll();
+      for(int i=0;i<allorderitem.size();i++)
+       {
+             if (allorderitem.get(i).bookid == bookid_query&& allorderitem.get(i).userid==userid) {
+
+
+               Integer orderid=allorderitem.get(i).getOrderid();
+               Order order=orderRepository.findByOrderid(orderid);
+               String ordertime=order.getOrdertime();
+
+
+               String year = ordertime.substring(0, 4);
+                String month = ordertime.substring(5, 7);
+                String date = ordertime.substring(8, 10);
+
+                Integer year_int = Integer.valueOf(year);
+                Integer month_int=Integer.valueOf(month);
+                Integer date_int =Integer.valueOf(date);
+
+                 if(year_int>year_query_int)
+                {
+                    sales+=allorderitem.get(i).getNumber() ;
+                }
+                if(year_int==year_query_int)
+                {
+                    if(month_int>month_query_int)
+                    {
+                        sales+=allorderitem.get(i).getNumber();
+                    }
+
+                    if(month_int==month_query_int)
+                    {
+                        if(date_int>=date_query_int)
+                        {
+                            sales+=allorderitem.get(i).getNumber();
+                        }
+                    }
+                }
+            }
+        }
+
+        return "书籍"+bookname+"在时间"+year_query+"--"+month_query+"--"+date_query+"以后的销量为"+sales+"!";
+    }
+
+
+    @Override
+//管理员查询所有书在一定时间内的销量
+    public String allbooksalestimes(HttpServletRequest request)
+    {
+        String year_query =request.getParameter("year");
+        String month_query=request.getParameter("month");
+        String date_query =request.getParameter("date");
+
+        Integer year_query_int =Integer.valueOf(year_query);
+        Integer month_query_int=Integer.valueOf(month_query);
+        Integer date_query_int=Integer.valueOf(date_query);
+
+        List <Books> allbooks=bookRepository.findAll();
+
+        String answer="";
+
+        List<OrderItem> allorderitem =orderItemRepository.findAll();
+
+
+        for(int j=0;j<allbooks.size();j++)
+        {
+            String bookname =allbooks.get(j).getName();
+            Integer bookid_query=bookRepository.findByBookname(bookname).getId();
+            Integer sales=0;
+
+            for(int i=0;i<allorderitem.size();i++)
+            {
+                if (allorderitem.get(i).bookid == bookid_query) {
+
+
+                    Integer orderid=allorderitem.get(i).getOrderid();
+                    Order order=orderRepository.findByOrderid(orderid);
+                    String ordertime=order.getOrdertime();
+
+
+                    String year = ordertime.substring(0, 4);
+                    String month = ordertime.substring(5, 7);
+                    String date = ordertime.substring(8, 10);
+
+                    Integer year_int = Integer.valueOf(year);
+                    Integer month_int=Integer.valueOf(month);
+                    Integer date_int =Integer.valueOf(date);
+
+                    if(year_int>year_query_int)
+                    {
+                        sales+=allorderitem.get(i).getNumber() ;
+                    }
+                    if(year_int==year_query_int)
+                    {
+                        if(month_int>month_query_int)
+                        {
+                            sales+=allorderitem.get(i).getNumber();
+                        }
+
+                        if(month_int==month_query_int)
+                        {
+                            if(date_int>=date_query_int)
+                            {
+                                sales+=allorderitem.get(i).getNumber();
+                            }
+                        }
+                    }
+                }
+            }
+
+            answer=answer+"\r\n"+"书籍"+bookname+"在时间"+year_query+"--"+month_query+"--"+date_query+"以后的销量为"+sales+ '!';
+
+        }
+
+        return answer;
+    }
+
+@Override
+    public String custimebuy(HttpServletRequest request)
+{
+    String year_query =request.getParameter("year");
+    String month_query=request.getParameter("month");
+    String date_query =request.getParameter("date");
+
+    Integer year_query_int =Integer.valueOf(year_query);
+    Integer month_query_int=Integer.valueOf(month_query);
+    Integer date_query_int=Integer.valueOf(date_query);
+
+    List <Books> allbooks=bookRepository.findAll();
+
+    String answer="";
+
+    List<OrderItem> allorderitem =orderItemRepository.findAll();
+
+
+    for(int j=0;j<allbooks.size();j++)
+    {
+        String bookname =allbooks.get(j).getName();
+        Integer bookid_query=bookRepository.findByBookname(bookname).getId();
+        Integer sales=0;
+
+        for(int i=0;i<allorderitem.size();i++)
+        {
+            if (allorderitem.get(i).bookid == bookid_query) {
+
+
+                Integer orderid=allorderitem.get(i).getOrderid();
+                Order order=orderRepository.findByOrderid(orderid);
+                String ordertime=order.getOrdertime();
+
+
+                String year = ordertime.substring(0, 4);
+                String month = ordertime.substring(5, 7);
+                String date = ordertime.substring(8, 10);
+
+                Integer year_int = Integer.valueOf(year);
+                Integer month_int=Integer.valueOf(month);
+                Integer date_int =Integer.valueOf(date);
+
+                if(year_int>year_query_int)
+                {
+                    sales+=allorderitem.get(i).getNumber() ;
+                }
+                if(year_int==year_query_int)
+                {
+                    if(month_int>month_query_int)
+                    {
+                        sales+=allorderitem.get(i).getNumber();
+                    }
+
+                    if(month_int==month_query_int)
+                    {
+                        if(date_int>=date_query_int)
+                        {
+                            sales+=allorderitem.get(i).getNumber();
+                        }
+                    }
+                }
+            }
+        }
+        if(sales!=0)
+        {
+            answer = answer + "\r\n" + "您关于书籍" + bookname + "在时间" + year_query + "--" + month_query + "--" + date_query + "以后的购买量为" + sales + '!';
+        }
+    }
+
+    return answer;
+
+
+}
+
+
     /*public  List<order_out_structure> querycart(HttpServletRequest request)
     {
         ServletContext servletContext=request.getServletContext();

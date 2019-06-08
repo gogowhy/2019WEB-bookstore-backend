@@ -100,6 +100,26 @@ public class OrderController
     return orderService.booksales(request);
 }
 
+
+    @RequestMapping("timesalesall")
+    @ResponseBody
+    public String timesalesall(HttpServletRequest request) {
+        return orderService.timesalesall(request);
+    }
+
+    @RequestMapping("allbooksalestimes")
+    @ResponseBody
+    public String allbooksalestimes(HttpServletRequest request)
+    {
+        return orderService.allbooksalestimes(request);
+    }
+
+    @RequestMapping("custimebuy")
+    @ResponseBody
+    public String custimebuy(HttpServletRequest request)
+    {
+        return orderService.custimebuy(request);
+    }
     /*public  List<order_out_structure> querycart(HttpServletRequest request)
     {
         ServletContext servletContext=request.getServletContext();

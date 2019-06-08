@@ -41,4 +41,9 @@ public interface OrderService {
 
     List<order_out_structure> queryallorder(HttpServletRequest request);
     String booksales(HttpServletRequest request) ;
+    String timesalesall (HttpServletRequest request);
+
+    String allbooksalestimes(HttpServletRequest request);
+
+    String custimebuy(HttpServletRequest request);
 }

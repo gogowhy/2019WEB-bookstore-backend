@@ -72,4 +72,24 @@ public class OrderServiceImpl implements OrderService {
     public String booksales(HttpServletRequest request) {
         return orderDao.booksales(request);
     }
+
+    @Override
+    public String timesalesall(HttpServletRequest request)
+    {
+        return orderDao.timesalesall(request);
+    }
+
+
+    @Override
+    public  String allbooksalestimes(HttpServletRequest request)
+    {
+        return  orderDao.allbooksalestimes(request);
+    }
+
+    @Override
+    public  String custimebuy(HttpServletRequest request)
+    {
+        return orderDao.custimebuy(request);
+    }
+
 }

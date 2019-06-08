@@ -30,8 +30,12 @@ public interface OrderDao {
      List<order_out_structure> querycart(HttpServletRequest request);
 
 
-
-
     List<order_out_structure> queryallorder(HttpServletRequest request);
     String booksales(HttpServletRequest request) ;
+
+    String timesalesall(HttpServletRequest request);
+
+    String allbooksalestimes(HttpServletRequest request);
+
+    String custimebuy(HttpServletRequest request);
 }
