@@ -4,11 +4,9 @@ import book.demo.dao.OrderDao;
 import book.demo.entity.Books;
 import book.demo.entity.Order;
 import book.demo.entity.OrderItem;
+import book.demo.entity.Cart;
 import book.demo.entity.order_out_structure;
-import book.demo.repository.BookRepository;
-import book.demo.repository.OrderItemRepository;
-import book.demo.repository.OrderRepository;
-import book.demo.repository.UserRepository;
+import book.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +29,10 @@ public class OrderDaoImpl implements OrderDao {
     public OrderItemRepository orderItemRepository;
     @Autowired
     public BookRepository bookRepository;
+    @Autowired
+    public CartRepository cartRepository;
 
-
-   @Override
+    @Override
     public List<Order> queryAll(){
         List<Order> list = new ArrayList<Order>();
         list = orderRepository.findAll();
@@ -87,10 +86,26 @@ public class OrderDaoImpl implements OrderDao {
         ServletContext servletContext=request.getServletContext();
         String title = servletContext.getAttribute("username").toString();
         Integer userid=userRepository.findByUsername(title).getUserid();
-        List<Order> orders=orderRepository.findByUserid(userid);
-        List<Order> middle = new ArrayList<Order>();
+
+
+
+        List<OrderItem> orderItems=orderItemRepository.findByUserid(userid);
         List<order_out_structure> output=new ArrayList<order_out_structure>();
-        for(Integer i=0;i<orders.size();i++)
+
+
+        for(int i=0;i<orderItems.size();i++)
+        {
+            if(orderItems.get(i).userid==userid)
+            {  order_out_structure temp_out=new order_out_structure();
+               temp_out.price=bookRepository.findByBookid(orderItems.get(i).bookid).getPrice();
+               temp_out.orderid=orderItems.get(i).orderid;
+               temp_out.number=orderItems.get(i).number;
+               temp_out.bookname=bookRepository.findByBookid(orderItems.get(i).bookid).getName();
+               temp_out.ordertime=orderRepository.findByOrderid(orderItems.get(i).orderid).ordertime;
+               output.add(temp_out);
+            }
+        }
+        /*for(Integer i=0;i<orders.size();i++)
         {
 
             if(orders.get(i).paid==1)
@@ -121,7 +136,7 @@ public class OrderDaoImpl implements OrderDao {
                 output.add(the_temp_out);
             }
 
-        }
+        }*/
 
         return output;
 
@@ -135,7 +150,24 @@ public class OrderDaoImpl implements OrderDao {
         ServletContext servletContext=request.getServletContext();
         String title = servletContext.getAttribute("username").toString();
         Integer userid=userRepository.findByUsername(title).getUserid();
-        List<Order> orders=orderRepository.findByUserid(userid);
+
+        List<Cart> cart=cartRepository.findByUserid(userid);
+        List<order_out_structure> output=new ArrayList<order_out_structure>();
+
+
+       for(int i=0;i<cart.size();i++)
+       {
+           if(cart.get(i).paid==0)
+           {
+               order_out_structure temp_out =new order_out_structure();
+               temp_out.bookname=bookRepository.findByBookid(cart.get(i).bookid).getName();
+           temp_out.number=cart.get(i).number;
+           temp_out.orderid=cart.get(i).cartid;
+           temp_out.price=bookRepository.findByBookid(cart.get(i).bookid).getPrice();
+           output.add(temp_out);
+           }
+       }
+      /*  List<Order> orders=orderRepository.findByUserid(userid);
         List<Order> middle = new ArrayList<Order>();
         List<order_out_structure> output=new ArrayList<order_out_structure>();
         for(Integer i=0;i<orders.size();i++)
@@ -171,7 +203,7 @@ public class OrderDaoImpl implements OrderDao {
                 output.add(the_temp_out);
             }
 
-        }
+        }*/
 
         return output;
 
@@ -184,8 +216,24 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public  List<order_out_structure> queryallorder(HttpServletRequest request)
     {
+        List<OrderItem> orderItems=orderItemRepository.findAll();
+        List<order_out_structure> output=new ArrayList<order_out_structure>();
 
-        List<Order> orders=orderRepository.findAll();
+
+        for(int i=0;i<orderItems.size();i++)
+        {
+                order_out_structure temp_out=new order_out_structure();
+                temp_out.price=bookRepository.findByBookid(orderItems.get(i).bookid).getPrice();
+                temp_out.orderid=orderItems.get(i).orderid;
+                temp_out.number=orderItems.get(i).number;
+                temp_out.bookname=bookRepository.findByBookid(orderItems.get(i).bookid).getName();
+                temp_out.ordertime=orderRepository.findByOrderid(orderItems.get(i).orderid).ordertime;
+                temp_out.userid=orderItems.get(i).userid;
+                output.add(temp_out);
+
+        }
+
+       /* List<Order> orders=orderRepository.findAll();
         List<Order> middle = new ArrayList<Order>();
         List<order_out_structure> output=new ArrayList<order_out_structure>();
         for(Integer i=0;i<orders.size();i++)
@@ -223,6 +271,9 @@ public class OrderDaoImpl implements OrderDao {
             }
 
         }
+*/
+
+
 
         return output;
 

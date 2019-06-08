@@ -37,6 +37,10 @@ public class BookDaoImpl implements BookDao {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private CartRepository cartRepository;
+
+
 @Override
     public List<Books> queryAll(){
         List<Books> list = new ArrayList<Books>();
@@ -75,9 +79,10 @@ public class BookDaoImpl implements BookDao {
         String bookname =request.getParameter("bookname");
         String thenumber=request.getParameter("number");
         Integer number=Integer.valueOf(thenumber);
-        Order neworder=new Order();
+
         Books book=bookRepository.findByBookname(bookname);
-        neworder.setPaid(0);
+       /* Order neworder=new Order();
+         neworder.setPaid(0);
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String createdate = sdf.format(date);
@@ -89,26 +94,41 @@ public class BookDaoImpl implements BookDao {
         Integer userid=userRepository.findByUsername(title).getUserid();
         neworder.setUserid(userid);
 
-        orderRepository.save(neworder);
-        Integer orderid=neworder.getOrderid();
 
-        OrderItem orderItem =new OrderItem();
+        orderRepository.save(neworder);
+        Integer orderid=neworder.getOrderid();*/
+
+        /*OrderItem orderItem =new OrderItem();
         Integer bookid =book.getId();
         orderItem.setNumber(number);
         orderItem.setBookid(bookid);
         orderItem.setOrderid(orderid);
         orderItem.setUserid(userid);
+        orderItemRepository.save(orderItem);*/
+        ServletContext servletContext=request.getServletContext();
+        String title = servletContext.getAttribute("username").toString();
+        Integer userid=userRepository.findByUsername(title).getUserid();
+        Cart cart=new Cart();
+        Integer bookid=book.getId();
+        cart.setNumber(number);
+        cart.setBookid(bookid);
+        cart.setUserid(userid);
+        cart.setPaid(0);
+        cartRepository.save(cart);
 
 
-        orderItemRepository.save(orderItem);
+
+
         return"添加成功！";
     }
 
     @Override
     public String checknow(HttpServletRequest request)
     {
-        String theorderid=request.getParameter("orderid");
+        /*String theorderid=request.getParameter("orderid");
         Integer orderid=Integer.valueOf(theorderid);
+
+
         Order order=orderRepository.findByOrderid(orderid);
         List<OrderItem> orderItems =orderItemRepository.findByOrderid(orderid);
         for(Integer i=0;i<orderItems.size();i++)
@@ -122,7 +142,41 @@ public class BookDaoImpl implements BookDao {
         }
         order.setPaid(1);
 
+        orderRepository.save(order);*/
+
+        String thecartid=request.getParameter("cartid");
+        Integer cartid=Integer.valueOf(thecartid);
+
+        Cart cart=cartRepository.findByCartid(cartid);
+        Books book =bookRepository.findByBookid(cart.bookid);
+        Integer number=cart.number;
+        Integer repertory=book.getRepertory()-number;
+        book.setRepertory(repertory);
+        bookRepository.save(book);
+
+        Order order =new Order();
+        OrderItem orderItem=new OrderItem();
+
+        ServletContext servletContext=request.getServletContext();
+        String title = servletContext.getAttribute("username").toString();
+        Integer userid=userRepository.findByUsername(title).getUserid();
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String createdate = sdf.format(date);
+        cart.setPaid(1);
+        order.setPaid(1);
+        order.setUserid(userid);
+        order.setOrdertime(createdate);
         orderRepository.save(order);
+
+
+        orderItem.setBookid(cart.bookid);
+        orderItem.setNumber(cart.number);
+        orderItem.setOrderid(order.orderid);
+        orderItem.setUserid(userid);
+        orderItemRepository.save(orderItem);
+
+
         return"结账成功！！！";
 
     }
@@ -133,7 +187,42 @@ public class BookDaoImpl implements BookDao {
         ServletContext servletContext=request.getServletContext();
         String username = servletContext.getAttribute("username").toString();
         Integer userid =userRepository.findByUsername(username).getUserid();
-        List <Order> user_cart=orderRepository.findByUserid(userid);
+        List<Cart> cart=cartRepository.findByUserid(userid);
+
+        Order order =new Order();
+
+
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String createdate = sdf.format(date);
+
+        order.setPaid(1);
+        order.setUserid(userid);
+        order.setOrdertime(createdate);
+        orderRepository.save(order);
+        for(int i=0;i<cart.size();i++)
+        {
+            if(cart.get(i).paid==0&&cart.get(i).userid==userid)
+            {
+                Books book =bookRepository.findByBookid(cart.get(i).bookid);
+                Integer number=cart.get(i).number;
+                Integer repertory=book.getRepertory()-number;
+                book.setRepertory(repertory);
+                bookRepository.save(book);
+
+
+                OrderItem orderItem=new OrderItem();
+
+
+                cart.get(i).setPaid(1);
+                orderItem.setBookid(cart.get(i).bookid);
+                orderItem.setNumber(cart.get(i).number);
+                orderItem.setOrderid(order.orderid);
+                orderItem.setUserid(userid);
+                orderItemRepository.save(orderItem);
+            }
+        }
+        /*List <Order> user_cart=orderRepository.findByUserid(userid);
         for(Integer i=0;i<user_cart.size();i++)
         {
             List<OrderItem> orderItems =orderItemRepository.findByOrderid(user_cart.get(i).getOrderid());
@@ -153,7 +242,32 @@ public class BookDaoImpl implements BookDao {
             }
             user_cart.get(i).setPaid(1);
             orderRepository.save(user_cart.get(i));
+        }*/
+
+       /* List<Cart> user_cart =cartRepository.findByUserid(userid);
+        Order neworder =new Order();
+        orderRepository.save(neworder);
+        for(int i=0;i<user_cart.size();i++)
+        {
+            user_cart.get(i).setPaid(1);
+            OrderItem orderItem=new OrderItem();
+            orderItem.setUserid(user_cart.get(i).userid);
+            orderItem.setOrderid(neworder.orderid);
+            orderItem.setNumber(user_cart.get(i).number);
+            orderItem.setBookid(user_cart.get(i).bookid);
+            orderItemRepository.save(orderItem);
         }
+
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String createdate = sdf.format(date);
+        neworder.setOrdertime(createdate);
+        neworder.setUserid(userid);
+        neworder.setPaid(1);
+        orderRepository.save(neworder);*/
+
+
+
         return "已经为所有商品结账";
     }
 
