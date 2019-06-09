@@ -122,6 +122,34 @@ public class BookDaoImpl implements BookDao {
         return"添加成功！";
     }
 
+
+
+    @Override
+    public String numberbuy(HttpServletRequest request)
+    {
+        String thenumber=request.getParameter("number");
+        Integer number=Integer.valueOf(thenumber);
+        ServletContext servletContext=request.getServletContext();
+        String bookname = servletContext.getAttribute("bookname").toString();
+
+        Books book=bookRepository.findByBookname(bookname);
+
+        String title = servletContext.getAttribute("username").toString();
+        Integer userid=userRepository.findByUsername(title).getUserid();
+        Cart cart=new Cart();
+        Integer bookid=book.getId();
+        cart.setNumber(number);
+        cart.setBookid(bookid);
+        cart.setUserid(userid);
+        cart.setPaid(0);
+        cartRepository.save(cart);
+
+
+
+
+        return"添加成功！";
+    }
+
     @Override
     public String checknow(HttpServletRequest request)
     {
@@ -339,6 +367,17 @@ public class BookDaoImpl implements BookDao {
         ServletContext servletContext = request.getServletContext();
         servletContext.setAttribute("bookname", bookname);
     }
+
+    @Override
+    public  void setbookdetailbyisbn(HttpServletRequest request)
+    {
+        String isbn=request.getParameter("isbn");
+        String bookname=bookRepository.findByIsbn(isbn).getName();
+        ServletContext servletContext = request.getServletContext();
+        servletContext.setAttribute("bookname", bookname);
+    }
+
+
 
 
     public List<Books> querydetail(HttpServletRequest request)

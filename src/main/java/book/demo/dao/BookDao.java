@@ -31,6 +31,7 @@ public interface BookDao {
                     Integer repertory,String description);
      void update(Integer id);
    String addtocart(HttpServletRequest request);
+   String numberbuy(HttpServletRequest request);
   String checknow(HttpServletRequest request);
      String checkall (HttpServletRequest request);
     String bookdelete(HttpServletRequest request);
@@ -38,6 +39,7 @@ public interface BookDao {
     String bookdescription(HttpServletRequest request);
     String bookadd(HttpServletRequest request);
   void setbookdetail(HttpServletRequest request);
+  void setbookdetailbyisbn(HttpServletRequest request);
  List<Books> querydetail(HttpServletRequest request);
 
 

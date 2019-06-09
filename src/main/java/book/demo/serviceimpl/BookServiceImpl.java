@@ -54,6 +54,12 @@ public class BookServiceImpl implements BookService {
     {
              return bookDao.addtocart(request);
     }
+
+    @Override
+    public  String numberbuy(HttpServletRequest request)
+    {
+        return bookDao.numberbuy(request);
+    }
               @Override
     public String checknow(HttpServletRequest request)
      {
@@ -96,6 +102,14 @@ public class BookServiceImpl implements BookService {
      {
           bookDao.setbookdetail(request);
      }
+
+
+     @Override
+     public void setbookdetailbyisbn(HttpServletRequest request)
+     {
+         bookDao.setbookdetailbyisbn(request);
+     }
+
 
             @Override
     public List<Books> querydetail(HttpServletRequest request)

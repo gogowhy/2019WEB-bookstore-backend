@@ -53,6 +53,14 @@ public class BookController{
         return bookService.addtocart(request);
     }
 
+
+    @RequestMapping("numberbuy")
+    @ResponseBody
+    public String numberbuy(HttpServletRequest request)
+    {
+        return bookService.numberbuy(request);
+    }
+
     @RequestMapping("checknow")
     @ResponseBody
     public String checknow(HttpServletRequest request)
@@ -105,6 +113,15 @@ public class BookController{
     {
          bookService.setbookdetail(request);
     }
+
+
+    @RequestMapping("setbookdetailbyisbn")
+    @ResponseBody
+    public void setbookdetailbyisbn(HttpServletRequest request)
+    {
+        bookService.setbookdetailbyisbn(request);
+    }
+
 
     @RequestMapping("querydetail")
     @ResponseBody
