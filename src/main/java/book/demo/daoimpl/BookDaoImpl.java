@@ -343,6 +343,7 @@ public class BookDaoImpl implements BookDao {
         String author=request.getParameter("author");
         String repertory=request.getParameter("repertory");
         String description=request.getParameter("description");
+        String picture=request.getParameter("picture");
 
         Integer price_number=Integer.valueOf(price);
         Integer repertory_number=Integer.valueOf(repertory);
@@ -354,6 +355,7 @@ public class BookDaoImpl implements BookDao {
         book.setAuthor(author);
         book.setRepertory(repertory_number);
         book.setDescription(description);
+        book.setPicture(picture);
 
         bookRepository.save(book);
         return  "已新增图书"+name+"!" ;
@@ -391,7 +393,22 @@ public class BookDaoImpl implements BookDao {
         return list;
     }
 
+public void setpicture(Integer id,String picture)
+{
+    Books book =new Books();
+    book=bookRepository.findByBookid(id);
+    book.setPicture(picture);
+    bookRepository.save(book);
+}
 
+public String querythebookpicture(HttpServletRequest request)
+{
+    ServletContext servletContext=request.getServletContext();
+    String bookname = servletContext.getAttribute("bookname").toString();
+    Books book=bookRepository.findByBookname(bookname);
+    String picture_link=book.getPicture();
 
+    return picture_link;
+}
 
 }

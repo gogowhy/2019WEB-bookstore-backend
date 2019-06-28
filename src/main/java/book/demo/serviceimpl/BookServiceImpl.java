@@ -117,5 +117,16 @@ public class BookServiceImpl implements BookService {
          return bookDao.querydetail(request);
      }
 
+     @Override
+    public void setpicture(Integer id,String picture)
+     {
+      bookDao.setpicture(id,picture);
+     }
+
+    @Override
+    public String querythebookpicture(HttpServletRequest request)
+    {
+        return bookDao.querythebookpicture(request);
+    }
 
 }

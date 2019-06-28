@@ -29,11 +29,12 @@ public class Books {
     private Integer repertory;
 
 
-
     @Column(name="description")
     private String description;
 
 
+    @Column(name="picture")
+    private String picture;
 
     //需要声明无参数的构造函数
     public Books(){  }
@@ -85,5 +86,11 @@ public class Books {
         this.description = description;
     }
 
+    public String getPicture() {
+        return picture;
+    }
 
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
 }

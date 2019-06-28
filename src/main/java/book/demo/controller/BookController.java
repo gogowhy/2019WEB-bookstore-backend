@@ -130,4 +130,18 @@ public class BookController{
        return bookService.querydetail(request);
     }
 
+
+    @RequestMapping("setpicture/{bookid}/{picture}")
+    @ResponseBody
+    public void setpicture(@PathVariable("bookid")Integer id,@PathVariable("picture") String picture)
+    {
+         bookService.setpicture(id,picture);
+    }
+
+    @RequestMapping("querythebookpicture")
+    @ResponseBody
+    public String querythebookpicture(HttpServletRequest request)
+    {
+        return bookService.querythebookpicture(request);
+    }
 }

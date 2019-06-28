@@ -41,8 +41,8 @@ public interface BookService {
     void setbookdetail(HttpServletRequest request);
     void setbookdetailbyisbn(HttpServletRequest request);
     List<Books> querydetail(HttpServletRequest request);
-
-
+    void setpicture(Integer id,String picture);
+    String querythebookpicture (HttpServletRequest request);
 
 }
 
